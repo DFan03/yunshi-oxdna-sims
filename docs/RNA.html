@@ -1,0 +1,320 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RNA kissing-loop simulations: scripts by workflow</title><style>body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;margin:0;padding:0 14px 40px;max-width:900px;margin:auto;line-height:1.45;color:#222}
+h1{font-size:1.5em}h2{border-bottom:2px solid #4a6fa5;padding-top:12px;font-size:1.25em}h3{font-size:1.05em;margin-bottom:4px}
+code,pre{font-family:Menlo,Consolas,monospace;font-size:.85em}pre{background:#f3f5f8;padding:8px;overflow-x:auto;border-radius:4px}
+.step{border:1px solid #d5dbe5;border-radius:6px;padding:8px 12px;margin:10px 0}.step p{margin:4px 0}
+.k{font-weight:600;color:#4a6fa5}.gloss{background:#fff8e1;padding:2px 6px;border-radius:3px}
+.ver{font-size:.85em;color:#555}nav a{margin-right:8px;white-space:nowrap}svg{max-width:100%;height:auto}
+.unclear{color:#b3261e;font-weight:600}</style></head><body>
+<h1>RNA kissing-loop simulations: scripts by workflow</h1><p>oxRNA simulations of kissing-loop designs 2H, K1, T3, IVT (monomer and 8mer). Follow sections top to bottom.</p>
+<p><b>Data:</b> not in this repo. See <code>FILES.html</code> in the Yunshi_data folder on the USB drive.</p>
+<nav><a href="#setup">1. Setup of a run</a><a href="#relax">2. MC / MD relaxation</a><a href="#prod">3. Production MD</a><a href="#analysis">4. Analysis of trajectories</a><a href="#umbrella">5. Umbrella sampling and WHAM</a><a href="#ffs">6. Forward flux sampling (FFS)</a><a href="#ramp">7. Thermal ramp</a><a href="#plot">8. Plotting notebooks</a></nav>
+<h2>Workflow at a glance</h2><svg viewBox="0 0 522 238" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="11">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4a6fa5"/></marker></defs>
+<rect x="18" y="10" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="93.0" y="28" text-anchor="middle">Setup</text>
+<text x="93.0" y="42" text-anchor="middle">setup_run.py</text>
+<rect x="186" y="10" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="261.0" y="28" text-anchor="middle">MC relax</text>
+<text x="261.0" y="42" text-anchor="middle">oxDNA CPU</text>
+<rect x="354" y="10" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="429.0" y="28" text-anchor="middle">MD relax</text>
+<text x="429.0" y="42" text-anchor="middle">oxDNA CUDA</text>
+<rect x="354" y="86" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="429.0" y="104" text-anchor="middle">Production MD</text>
+<text x="429.0" y="118" text-anchor="middle">input_md</text>
+<rect x="186" y="86" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="261.0" y="104" text-anchor="middle">Analysis</text>
+<text x="261.0" y="118" text-anchor="middle">oat, hb_cal, bend/twist</text>
+<rect x="18" y="86" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="93.0" y="104" text-anchor="middle">Umbrella+WHAM</text>
+<text x="93.0" y="118" text-anchor="middle">setup_umb, wham</text>
+<rect x="18" y="162" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="93.0" y="180" text-anchor="middle">FFS / thermal ramp</text>
+<text x="93.0" y="194" text-anchor="middle">rates, T-dependence</text>
+<rect x="186" y="162" width="150" height="46" rx="6" fill="#e8eef8" stroke="#4a6fa5"/>
+<text x="261.0" y="180" text-anchor="middle">Plots</text>
+<text x="261.0" y="194" text-anchor="middle">notebooks</text>
+<line x1="168" y1="33.0" x2="186" y2="33.0" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="336" y1="33.0" x2="354" y2="33.0" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="429.0" y1="56" x2="429.0" y2="86" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="354" y1="109.0" x2="336" y2="109.0" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="186" y1="109.0" x2="168" y2="109.0" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="93.0" y1="132" x2="93.0" y2="162" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+<line x1="168" y1="185.0" x2="186" y2="185.0" stroke="#4a6fa5" stroke-width="1.5" marker-end="url(#a)"/>
+</svg>
+<p>Paths below are relative to the repo; scripts are run inside the simulation or analysis directory, not from the repo root. Hard-coded cluster paths are listed in <a href='PORTABILITY.md'>PORTABILITY.md</a>. Versions: <a href='VERSIONS.md'>VERSIONS.md</a>.</p>
+<h2 id="setup">1. Setup of a run</h2>
+<div class="step"><h3><code>rna/setup/setup_run.py</code></h3>
+<p><span class="k">When:</span> First step for a new structure. Run in a directory holding exactly one <code>.top</code> and one <code>.dat/.oxdna</code>.</p>
+<p class="gloss">oxRNA: coarse-grained RNA model, one bead-with-sites per nucleotide.</p>
+<p><span class="k">In / out:</span> In: topology + start configuration. Out: <code>&lt;prefix&gt;_relax/_md/_analysis</code> dirs, copies of <code>input_pre_relax</code>, <code>input_cuda_relax</code>, <code>plot_energy.ipynb</code>, and <code>cmds_relax</code>.</p>
+<pre>python setup_run.py
+# cmds_relax then contains:
+# /home/dfan/oxDNA/build/bin/oxDNA input_pre_relax
+# sleep 5
+# /home/dfan/oxDNA/build/bin/oxDNA input_cuda_relax</pre>
+<p class="ver">Version: canonical = newest copy; 3 older distinct version(s) in <code>archive/setup_run/</code>.</p></div>
+<div class="step"><h3><code>rna/setup/replacer.py</code></h3>
+<p><span class="k">When:</span> After setup_run: fill in file names in the input files.</p>
+<p><span class="k">In / out:</span> In: input* files. Out: <code>replace_me.dat/.top</code> replaced by the real names.</p>
+<pre>python replacer.py</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/special_replacer.py</code></h3>
+<p><span class="k">When:</span> Variant of replacer for non-standard placeholder cases. <span class='unclear'>Unclear</span> exact use from code alone.</p>
+<p><span class="k">In / out:</span> In/out: input files edited in place.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/mt_creater.py</code></h3>
+<p><span class="k">When:</span> To link monomers into an N-mer (8mer): writes mutual_trap forces.</p>
+<p class="gloss">Mutual trap: harmonic spring between two nucleotides.</p>
+<p><span class="k">In / out:</span> Out: <code>forces.txt</code> with stiff springs, r0 = 1.2, PBC=1. MONOMER_LENGTH = 244.</p>
+<pre>python mt_creater.py   # edit k-mer settings in the script</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/al_mt_creater.py</code></h3>
+<p><span class="k">When:</span> Alternative (aligned) mutual-trap generator.</p>
+<p><span class="k">In / out:</span> Out: forces file.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/multimerforce.py</code></h3>
+<p><span class="k">When:</span> Older/alternate multimer force generator.</p>
+<p><span class="k">In / out:</span> Out: forces file.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/force_remover.py</code></h3>
+<p><span class="k">When:</span> Remove force lines (e.g. before a production run without the linkers).</p>
+<p><span class="k">In / out:</span> In: forces file. Out: edited forces file.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/setup/ntremover.py</code></h3>
+<p><span class="k">When:</span> Remove nucleotides from a topology/configuration pair. <span class='unclear'>Unclear</span> argument order; read the script header.</p>
+<p><span class="k">In / out:</span> In: .top/.dat.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>templates/rna/input_pre_relax, input_cuda_relax, input_md</code></h3>
+<p><span class="k">When:</span> Templates the setup scripts copy; edit temperature, salt, steps.</p>
+<p><span class="k">In / out:</span> Used by setup_run.py.</p>
+<p class="ver">Version: single version.</p></div>
+<h2 id="relax">2. MC / MD relaxation</h2>
+<div class="step"><h3><code>templates/rna/input_pre_relax</code></h3>
+<p><span class="k">When:</span> Monte Carlo pre-relaxation on CPU, to remove overlaps.</p>
+<p class="gloss">MC: random moves accepted by Metropolis criterion.</p>
+<p><span class="k">In / out:</span> Out: relaxed configuration for the next stage.</p>
+<pre>/home/dfan/oxDNA/build/bin/oxDNA input_pre_relax</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>templates/rna/input_cuda_relax</code></h3>
+<p><span class="k">When:</span> Short MD relaxation on GPU (CUDA).</p>
+<p class="gloss">MD: integrates Newton equations with a thermostat.</p>
+<p><span class="k">In / out:</span> In: MC output. Out: relaxed conf + energy file (plot with notebooks/rna/plot_energy.ipynb).</p>
+<pre>/home/dfan/oxDNA/build/bin/oxDNA input_cuda_relax</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>jobs/rna/queue.sh</code></h3>
+<p><span class="k">When:</span> Submit relaxation commands on Slurm as an array (one line of cmds per task).</p>
+<p><span class="k">In / out:</span> In: file <code>cmds</code>.</p>
+<pre>sbatch queue.sh</pre>
+<p class="ver">Version: single version.</p></div>
+<h2 id="prod">3. Production MD</h2>
+<div class="step"><h3><code>templates/rna/input_md</code></h3>
+<p><span class="k">When:</span> Production MD input template (set steps, print intervals, T).</p>
+<p><span class="k">In / out:</span> Out: trajectory.dat, energy.dat, last_conf.dat.</p>
+<pre>oxDNA input_md</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>jobs/rna/queue_25_prod.sh</code></h3>
+<p><span class="k">When:</span> Submit production runs on Slurm (GPU partition).</p>
+<p><span class="k">In / out:</span> In: cmds file.</p>
+<pre>sbatch queue_25_prod.sh</pre>
+<p class="ver">Version: single version.</p></div>
+<h2 id="analysis">4. Analysis of trajectories</h2>
+<div class="step"><h3><code>rna/setup/setup_analysis.py</code></h3>
+<p><span class="k">When:</span> Prepare the analysis directory; writes the standard command list.</p>
+<p class="gloss">oat: oxDNA_analysis_tools, command-line toolkit (mean structure, alignment, RMSF).</p>
+<p><span class="k">In / out:</span> Out: <code>cmds.sh</code>.</p>
+<pre>python setup_analysis.py
+# cmds.sh:
+oat mean -p 4 -o mean.dat -d devs.json *trj.dat
+oat align -p 4 *trj.dat align.dat
+python hb_cal.py *_input.txt *trj.dat kissingloop.csv --output KL_HB.csv
+python total_hbond_cal.py *input.txt *trj.dat --output Total_HB.csv
+python signed_helical_bent_twist_cal.py align.dat helixces.txt</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/setup_analysis/</code>.</p></div>
+<div class="step"><h3><code>rna/setup/prepare_oat_workflow.py</code></h3>
+<p><span class="k">When:</span> Alternative that builds oat bond analysis from the forces.</p>
+<p><span class="k">In / out:</span> Out: cmds.sh.</p>
+<pre>oat generate_forces input_pre_relax last_conf.dat
+oat forces2pairs forces.txt
+oat bond_analysis *input.txt *_trj.dat pairs.txt -p 4</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/prepare_oat_workflow/</code>.</p></div>
+<div class="step"><h3><code>rna/analysis/hb_cal.py</code></h3>
+<p><span class="k">When:</span> Count hydrogen bonds among a chosen set of nucleotides (e.g. kissing loop).</p>
+<p class="gloss">Hydrogen bond (hb_list observable): base-pair contact energy below a cutoff.</p>
+<p><span class="k">In / out:</span> In: input, trajectory, index csv. Out: csv. Occupancy % = bonds / (n/2) x 100.</p>
+<pre>python hb_cal.py input.txt trj.dat kissingloop.csv -p 4 --output KL_HB.csv</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/total_hbond_cal.py</code></h3>
+<p><span class="k">When:</span> Same for all nucleotides.</p>
+<p><span class="k">In / out:</span> Out: Total_HB.csv.</p>
+<pre>python total_hbond_cal.py input.txt trj.dat --output Total_HB.csv</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/calculate_bond_instability.py</code></h3>
+<p><span class="k">When:</span> Per-bond stability from a bond-occupancy table.</p>
+<p class="gloss">BII: 0 for always/never bonded, 1 for bonded half the time.</p>
+<p><span class="k">In / out:</span> Out: Bond Instability Index 4p(1-p) per bond.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/log_transformer.py</code></h3>
+<p><span class="k">When:</span> Rescale BII for plotting.</p>
+<p><span class="k">In / out:</span> log(BII+1e-6) then min-max to [0,1].</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/plot_bond_instability.py</code></h3>
+<p><span class="k">When:</span> Plot BII.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/calculate_bond.py</code></h3>
+<p><span class="k">When:</span> Bond summary helper. <span class='unclear'>Unclear</span> how it differs from hb_cal.py.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/signed_helical_bent_twist_cal.py</code></h3>
+<p><span class="k">When:</span> Main bend/twist measurement per frame (current).</p>
+<p class="gloss">Segments LH1, SH1, SH2, LH4 (long/short helices). Bend: angle between SVD axes of LH1 and LH4. Twist: angle between radial vectors of SH1 and SH2 about the long-helix axis, signed right-handed. Bend sign from a reference normal fixed on frame 1.</p>
+<p><span class="k">In / out:</span> In: aligned trajectory + junctions file (1-based inclusive ranges, 3 or 5 fields). Out: <code>twist_bend.csv</code> (t, twist_deg, bend_deg).</p>
+<pre>python signed_helical_bent_twist_cal.py align.dat helixces.txt</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/helical_bent_twist_cal.py</code></h3>
+<p><span class="k">When:</span> Unsigned predecessor.</p>
+<p><span class="k">In / out:</span> Out: twist/bend csv.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/helix_bt.py, twist_bent.py, tb2.py</code></h3>
+<p><span class="k">When:</span> Earlier bend/twist variants, kept for older runs.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/distance_cal.py</code></h3>
+<p><span class="k">When:</span> Distance between two nucleotides over time.</p>
+<p><span class="k">In / out:</span> Out: distance file.</p>
+<pre>python distance_cal.py trj.dat nt1 nt2</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/dis_bent_plotter.py, dis_twist_plotter.py, dis_bond_plotter.py, dis_energy_plotter.py</code></h3>
+<p><span class="k">When:</span> Plot distance vs bend / twist / bonds / energy.</p>
+<p><span class="k">In / out:</span> In: distance file + the other file.</p>
+<pre>python dis_bent_plotter.py distance_file bend_file</pre>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/dis_bent_plotter/</code>.</p></div>
+<div class="step"><h3><code>rna/analysis/plot_energydat.py</code></h3>
+<p><span class="k">When:</span> Plot energy.dat.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/analysis/persistence_length.py</code></h3>
+<p><span class="k">When:</span> Persistence length of a helical segment from tangent correlations.</p>
+<p class="gloss">Persistence length Lp: distance over which direction memory decays; fit ln C(n) = -n/Lp on first third of offsets, x 0.8518 nm per sim unit.</p>
+<p><span class="k">In / out:</span> In: trajectory, input, csv of segment. Out: Lp (nm) + plot.</p>
+<pre>python persistence_length.py traj.dat input.txt segment.csv -p 4</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/persistence_length/</code>.</p></div>
+<div class="step"><h3><code>rna/multimer/multimer_tb.py</code></h3>
+<p><span class="k">When:</span> Bend/twist per monomer of a k-mer.</p>
+<p><span class="k">In / out:</span> Out: monomer_i.csv, average.csv.</p>
+<pre>python multimer_tb.py traj.dat junctions.txt 8</pre>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/multimer_tb/</code>.</p></div>
+<div class="step"><h3><code>rna/multimer/pairwise_tb.py</code></h3>
+<p><span class="k">When:</span> Pairwise version relative to mean reference.</p>
+<p><span class="k">In / out:</span> In: mean structure file.</p>
+<pre>python pairwise_tb.py traj.dat junctions.txt 8 average.dat</pre>
+<p class="ver">Version: single version.</p></div>
+<h2 id="umbrella">5. Umbrella sampling and WHAM</h2>
+<div class="step"><h3><code>rna/umbrella/setup_umb.py</code></h3>
+<p><span class="k">When:</span> Set up umbrella windows along an end-to-end reaction coordinate.</p>
+<p class="gloss">Umbrella sampling: each window holds the coordinate near a target with a harmonic bias, so rare states are sampled.</p>
+<p><span class="k">In / out:</span> In: parameters.txt (topology, xi_start, xi_end, n_windows, stiff, anchor_a, anchor_b, steps, template, T, salt). Out: <code>window_NN/equil|prod</code> with input, forces, check_equil.py, plus run_all.sh.</p>
+<pre>python setup_umb.py parameters.txt
+# e.g. xi 7.5-10.2, 20 windows, stiff 100, anchors 16/226</pre>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/setup_umb/</code>.</p></div>
+<div class="step"><h3><code>rna/umbrella/setup_prod.py</code></h3>
+<p><span class="k">When:</span> Regenerate production-only scripts.</p>
+<p><span class="k">In / out:</span> Out: run_prod.sh.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/umbrella/tune_stiff.py</code></h3>
+<p><span class="k">When:</span> Change stiffness / steps / print intervals in production inputs.</p>
+<p><span class="k">In / out:</span> Out: run_production_only.sh.</p>
+<pre>python tune_stiff.py NEW_STIFF NEW_STEPS NEW_PRINT_CONF NEW_PRINT_ENERGY [OXDNA_BIN]</pre>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/tune_stiff/</code>.</p></div>
+<div class="step"><h3><code>rna/umbrella/run_all.sh, run_prod.sh, run_production_only.sh</code></h3>
+<p><span class="k">When:</span> Auto-generated drivers: chained equilibrations then production. Contain absolute cluster paths.</p>
+<p><span class="k">In / out:</span> </p>
+<pre>bash run_all.sh</pre>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/run_all/</code>.</p></div>
+<div class="step"><h3><code>rna/umbrella/check_equil.py</code></h3>
+<p><span class="k">When:</span> Per window: check equilibration of the coordinate. Auto-generated per window (only ANCHOR_A, ANCHOR_B, XI0 differ).</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: canonical = newest copy; 2 older distinct version(s) in <code>archive/check_equil/</code>.</p></div>
+<div class="step"><h3><code>rna/umbrella/check_dis.py</code></h3>
+<p><span class="k">When:</span> Quick distance check of a configuration.</p>
+<p><span class="k">In / out:</span> </p>
+<pre>python check_dis.py conf.dat anchor_a anchor_b</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/umbrella/wham_cal.py, wham_com.py, wham_calculate.py</code></h3>
+<p><span class="k">When:</span> Combine windows into a free-energy profile.</p>
+<p class="gloss">WHAM: iterative reweighting of biased histograms into one unbiased PMF. Bias 0.5 k (x-r0)^2, beta=1, 80 bins, converge max|df|<1e-6 (<=10000 iters), F = -ln P, min shifted to 0, x 0.8518 nm. wham_com uses centre-of-mass distance.</p>
+<p><span class="k">In / out:</span> Out: PMF (.dat) and plot.</p>
+<pre>python wham_cal.py   # run in umbrella dir</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/wham_cal/</code>.</p></div>
+<div class="step"><h3><code>rna/umbrella/force_from_pmf.py</code></h3>
+<p><span class="k">When:</span> Force profile from PMF.</p>
+<p><span class="k">In / out:</span> f = -dF/dx x 4.1 pN per kBT/nm.</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/umbrella/compute_barrier_forces.py</code></h3>
+<p><span class="k">When:</span> Barrier height, closed/open minima, DeltaF, mean downhill forces.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/umbrella/2state.py, state_average.py</code></h3>
+<p><span class="k">When:</span> Two-state analysis: open = 0 HB, closed = 6 HB.</p>
+<p><span class="k">In / out:</span> DeltaG = -kBT ln(P_closed/P_open).</p>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/umbrella/plot_window.py, pwindow.py, plot_complete.py, plot_completed.py, plot_com_by_window.py</code></h3>
+<p><span class="k">When:</span> Plots per window and overall.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<h2 id="ffs">6. Forward flux sampling (FFS)</h2>
+<div class="step"><h3><code>rna/ffs/setup_kl_ffs.py</code></h3>
+<p><span class="k">When:</span> Set up an FFS run for a kissing loop.</p>
+<p class="gloss">FFS: estimates rates of rare transitions by shooting trajectories between successive order-parameter interfaces.</p>
+<p><span class="k">In / out:</span> Copies op.txt, creates FLUX and N_shoot dirs, writes cmd_ffs.</p>
+<pre>python setup_kl_ffs.py X</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/ffs/ffs_flux.py</code></h3>
+<p><span class="k">When:</span> Stage 1: flux through the first interface.</p>
+<p><span class="k">In / out:</span> Template: templates/rna/ffs/input (sim_type=FFS_MD), op.txt.</p>
+<pre>python ffs_flux.py -n 100 -s 1 -c 8</pre>
+<p class="ver">Version: single version.</p></div>
+<div class="step"><h3><code>rna/ffs/ffs_shoot.py</code></h3>
+<p><span class="k">When:</span> Stage 2: shoot from one interface to the next.</p>
+<p><span class="k">In / out:</span> </p>
+<pre>python ffs_shoot.py -n 100 -s 1 -c 8 -k 0</pre>
+<p class="ver">Version: canonical = newest copy; 9 older distinct version(s) in <code>archive/ffs_shoot/</code>.</p></div>
+<div class="step"><h3><code>rna/ffs/extract_conf_hb.py</code></h3>
+<p><span class="k">When:</span> Extract configurations / HB counts from FFS output. <span class='unclear'>Unclear</span> details.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<h2 id="ramp">7. Thermal ramp</h2>
+<div class="step"><h3><code>rna/thermal_ramp/thermal_ramp_setup.py</code></h3>
+<p><span class="k">When:</span> Make per-step inputs for a temperature ramp.</p>
+<p><span class="k">In / out:</span> Out: inputMD_stepN_XXc.</p>
+<pre>python thermal_ramp_setup.py -s 37 -e 4 -t 10 -input input_md</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/thermal_ramp_setup/</code>.</p></div>
+<div class="step"><h3><code>rna/thermal_ramp/run_thermal_ramp.sh</code></h3>
+<p><span class="k">When:</span> Run steps 1..10 (37 C down to 4 C) in sequence.</p>
+<p><span class="k">In / out:</span> </p>
+<pre>bash run_thermal_ramp.sh</pre>
+<p class="ver">Version: canonical = newest copy; 1 older distinct version(s) in <code>archive/run_thermal_ramp/</code>.</p></div>
+<div class="step"><h3><code>rna/thermal_ramp/wrap_thermal_ramp.py</code></h3>
+<p><span class="k">When:</span> Join step trajectories and align.</p>
+<p><span class="k">In / out:</span> Runs <code>oat align</code>.</p>
+<p class="ver">Version: single version.</p></div>
+<h2 id="plot">8. Plotting notebooks</h2>
+<div class="step"><h3><code>notebooks/rna/plot_energy.ipynb</code></h3>
+<p><span class="k">When:</span> Energy of MC and MD relaxation.</p>
+<p><span class="k">In / out:</span> In: mc_relax_energy.dat, md_relax_energy.dat.</p>
+<p class="ver">Version: canonical = newest copy; 3 older distinct version(s) in <code>archive/plot_energy/</code>.</p></div>
+<div class="step"><h3><code>notebooks/rna/plot_analysis_results.ipynb</code></h3>
+<p><span class="k">When:</span> Bend/twist time series, histograms, HB.</p>
+<p><span class="k">In / out:</span> In: twist_bend.csv.</p>
+<p class="ver">Version: canonical = newest copy; 3 older distinct version(s) in <code>archive/plot_analysis_results/</code>.</p></div>
+<div class="step"><h3><code>notebooks/rna/plot_multimer.ipynb</code></h3>
+<p><span class="k">When:</span> Per-monomer twist/bend (k-mer).</p>
+<p><span class="k">In / out:</span> In: monomer_i.csv, average.csv.</p>
+<p class="ver">Version: canonical = newest copy; 4 older distinct version(s) in <code>archive/plot_multimer/</code>.</p></div>
+<div class="step"><h3><code>notebooks/rna/cross_plotter.ipynb, plot_monos.ipynb, figure_template.ipynb</code></h3>
+<p><span class="k">When:</span> Cross-design KDE comparisons and figure styling. figure_template has a hard-coded local Downloads path.</p>
+<p><span class="k">In / out:</span> </p>
+<p class="ver">Version: single version.</p></div>
+<h2>Unclear / caveats</h2><ul><li>Which of the multimer-force scripts (mt_creater, al_mt_creater, multimerforce) was used for a given run is <span class='unclear'>unclear</span> from code alone.</li><li>umbrella K1IVT8mer and us_k1 directories were filed under RNA by name; confirm.</li><li>Exact numerical thresholds in hb_cal come from the oxDNA hb_list observable and the input file, not from the script.</li></ul>
+</body></html>
