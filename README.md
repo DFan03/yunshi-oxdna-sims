@@ -43,7 +43,7 @@ Also: [docs/PORTABILITY.md](docs/PORTABILITY.md) (hard-coded paths, Slurm settin
 
 ## Data location
 
-Not in git. Data live on the USB drive in `Yunshi_data/` (`RNA/`, `DNA/`, `WetLab/`); see `FILES.md` there for the inventory.
+Not in git. Data live on the USB drive in `Yunshi_data/` (`RNA/`, `DNA/`, `WetLab/`); see [FILES.md](FILES.md) (copy of the drive inventory, also `FILES.html` on the drive) for what is where. Verify a copy of the data with `shasum -a 256 -c SHA256SUMS.txt` run inside `Yunshi_data/`.
 
 ## Versions policy
 
