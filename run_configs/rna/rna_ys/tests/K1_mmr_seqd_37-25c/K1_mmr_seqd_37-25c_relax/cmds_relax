@@ -1,0 +1,3 @@
+/home/dfan/oxDNA/build/bin/oxDNA input_pre_relax
+sleep 5
+/home/dfan/oxDNA/build/bin/oxDNA input_cuda_relax

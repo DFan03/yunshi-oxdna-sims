@@ -1,0 +1,1 @@
+This run is not continued because the stocastic twist in backbone makes it extremely difficult to duplicate and assmble into a 8mer.

@@ -1,0 +1,14 @@
+To Calculate RMSF and Mean:
+oat mean -p 4 -o mean.dat -d devs.json replace_me.dat
+
+To Calculate Bond Occupancy:
+
+1. oat generate_forces input_pre_relax last_conf.dat
+** using the MC relaxed config as reference 
+
+2. oat forces2pairs forces.txt
+**Generate the bond pairs from the force file from last step
+
+3.oat bond_analysis input_md MD_trajectory.dat pairs.txt -p 4
+**
+

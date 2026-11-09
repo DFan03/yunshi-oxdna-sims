@@ -1,0 +1,4 @@
+by default this run uses- Relax- sequence dependent paratmeter on, mismatch repulsion = 1, 37c
+The MD by default uses oxdna.org settings, with seq dependent on and mmr on, also 37c
+
+Because oxdna.org does not take topology file with new configuration, the relax output is import+export by oxview to generate input for oxdna.org MD simulation..

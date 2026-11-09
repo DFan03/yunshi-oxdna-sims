@@ -1,0 +1,17 @@
+topology = nanotweezer-protruding-close_PATCH4_chl.top 
+conf_file = md_last_conf.dat 
+group_a_csv = a_open.csv
+group_b_csv = b_open.csv
+xi_min = 60
+xi_max = 9  
+n_windows = 25
+stiff = 1
+anchor_a = 3703
+anchor_b = 1230
+equil_steps = 1000000
+prod_steps = 10000000
+md_template = us_template_input.txt
+oxdna_bin = /home/donglifan/oxDNA/build/bin/oxDNA
+temperature = 20C
+salt_concentration = 1
+seq_dep_file = /home/donglifan/oxdna/oxDNA2_sequence_dependent_parameters.txt 

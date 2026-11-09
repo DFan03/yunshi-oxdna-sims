@@ -1,0 +1,6 @@
+This run uses by default- Mismatch Repulsion on, Sequence dependent parameter on and 37C for relax.
+Also by default- MMR on and 37C for MD, which runs on oxdna.org.
+
+Two variants of the MD run- SeqdOn and OFF.
+
+This version of K1IVT has been remodeled in oxview manually to remove clashes in the helix.

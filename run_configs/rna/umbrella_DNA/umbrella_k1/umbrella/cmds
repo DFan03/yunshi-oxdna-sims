@@ -1,0 +1,44 @@
+
+
+
+
+
+cd window_00/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_01/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_02/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_03/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_04/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_05/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_06/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_07/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_08/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+
+
+cd window_09/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+
+

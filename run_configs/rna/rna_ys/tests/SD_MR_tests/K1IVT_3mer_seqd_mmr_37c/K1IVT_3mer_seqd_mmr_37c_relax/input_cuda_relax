@@ -1,0 +1,47 @@
+backend = CUDA
+backend_precision = mixed
+max_backbone_force = 3
+max_backbone_force_far = 10
+interaction_type = RNA2
+mismatch_repulsion = true
+salt_concentration = 1
+CUDA_list = verlet
+CUDA_sort_every = 0
+use_edge = 1
+edge_n_forces = 1
+debug = 0
+use_average_seq = 0
+seq_dep_file = /home/dfan/inputs_paras_oxDNA/rna_sequence_dependent_parameters.txt 
+verlet_skin = 1.0
+debug = 1
+cells_auto_optimisation = true
+
+
+T = 37C
+dt = 0.001
+thermostat = langevin
+diff_coeff = 2.5
+newtonian_steps = 103
+steps = 100000000
+max_density_multiplier = 10
+
+reset_com_momentum = true
+refresh_vel = 1
+print_conf_interval = 500000
+
+
+conf_file = mc_relax_last_conf.dat
+topology = K1_IVT_3mer.top 
+trajectory_file = md_relax_trj.dat
+energy_file = md_relax_energy.dat
+lastconf_file = md_relax_last_conf.dat
+
+
+restart_step_counter = 0
+print_energy_every = 30000
+time_scale = linear
+
+
+
+
+max_io=1000

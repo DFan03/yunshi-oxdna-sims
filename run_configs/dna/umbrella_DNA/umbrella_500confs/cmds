@@ -1,0 +1,26 @@
+cd window_00/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_01/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_02/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_03/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_04/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_05/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_06/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_07/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_08/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_09/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_10/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_11/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_12/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_13/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_14/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_15/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_16/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_17/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_18/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_19/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_20/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_21/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_22/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_23/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+cd window_24/prod && /home/donglifan/oxdna/build/bin/oxDNA input.txt > run.log 2>&1
+

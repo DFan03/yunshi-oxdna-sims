@@ -1,0 +1,16 @@
+# data / trajectories (never commit)
+*.dat
+!templates/**/*.dat
+*.zst
+*.pyidx
+trajectory*
+*_trj*
+*.top
+!templates/**/*.top
+__pycache__/
+*.pyc
+.DS_Store
+._*
+.ipynb_checkpoints/
+.venv/
+*.out

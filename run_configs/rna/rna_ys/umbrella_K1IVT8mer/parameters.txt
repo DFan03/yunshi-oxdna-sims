@@ -1,0 +1,14 @@
+topology = K1IVT8mer.top 
+conf_file = K1IVT8mer.dat
+xi_start = 7 
+xi_end = 12
+n_windows = 25
+stiff = 100
+anchor_a = 991
+anchor_b = 1149
+equil_steps = 2000000
+prod_steps = 10000000
+md_template = us_template_input.txt
+oxdna_bin = /home/donglifan/oxdna/build/bin/oxDNA 
+temperature = 20C
+salt_concentration = 1

@@ -1,0 +1,10 @@
+{
+	order_parameter = bond         
+	name = bond1 
+	pair1 = 270, 463
+	pair2 = 271, 462
+	pair3 = 272, 461
+	pair4 = 273, 460
+	pair5 = 274, 459
+	pair6 = 275, 458
+}
