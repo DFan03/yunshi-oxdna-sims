@@ -7,10 +7,13 @@ Analysis, setup and job scripts for coarse-grained oxDNA/oxRNA simulations: RNA 
 ```bash
 git clone https://github.com/DFan03/yunshi-oxdna-sims.git
 cd yunshi-oxdna-sims
-bash setup.sh        # conda/mamba env if available, else .venv + pip; runs a smoke test
 ```
 
-`setup.sh` installs numpy, scipy, pandas, matplotlib, seaborn, jupyter and `oxDNA_analysis_tools` (oat), then imports them and byte-compiles every script. It warns (not fails) if `oxpy` is missing.
+- **On your laptop/workstation:** `bash setup_local.sh` (conda/mamba env `yunshi-oxdna`, else `.venv`; add `--build-oxdna` to also build oxDNA on CPU).
+- **On DelftBlue:** `bash setup_hpc.sh` (loads modules, venv on `/scratch/$USER`; add `--build-oxdna` for the CUDA build).
+- `bash setup.sh` picks one of the two automatically (DelftBlue if `sbatch` exists or the hostname contains `delftblue`).
+
+Both install numpy, scipy, pandas, matplotlib, seaborn, jupyter and `oxDNA_analysis_tools` (oat), then run `tools/smoke_test.py` (imports plus byte-compile of every script). A missing `oxpy` is a warning, not a failure.
 
 ## Guides
 
