@@ -184,8 +184,51 @@ DNA_SECTIONS = [
 DNA_STAGES = ["Setup|setup_run.py","MC relax|oxDNA CPU","MD relax|oxDNA CUDA","Production MD|input_md","Analysis|HB, angle, bend/twist","Umbrella+WHAM|COM coordinate","Thermal ramp|T-dependence","Plots|notebooks"]
 DNA_NOTES = ["No FFS scripts exist for DNA in the sources.","dna/umbrella/try.sh purpose is <span class='unclear'>unclear</span>.","umbrella_DNA/us_k1 and umbrella_k1 were classified as RNA by name; confirm."]
 
+
+import re
+def _md(t):
+    t = re.sub(r"<span class='unclear'>(.*?)</span>", r"**\1**", t)
+    t = re.sub(r"<code>(.*?)</code>", r"`\1`", t)
+    t = re.sub(r"<[^>]+>", "", t)
+    return html.unescape(t).replace("|", "\\|")
+
+def mermaid(stages):
+    ids = [f"S{i}" for i in range(len(stages))]
+    o = ["```mermaid", "flowchart LR"]
+    for i, s in enumerate(stages):
+        o.append(f'  {ids[i]}["{s.replace("|", "<br/>")}"]')
+    o.append("  " + " --> ".join(ids))
+    o.append("```")
+    return "\n".join(o)
+
+def page_md(title, intro, stages, sections, notes):
+    o = [f"# {title}", "", _md(intro), "",
+         "Data are not in this repo: see `FILES.md` in the Yunshi_data folder on the USB drive.", "",
+         "HTML twin: " + ("RNA.html" if "RNA" in title else "DNA.html") + ". Hard-coded cluster paths: [PORTABILITY.md](PORTABILITY.md). Versions: [VERSIONS.md](VERSIONS.md). Run scripts inside the simulation or analysis directory.", "",
+         "## Workflow at a glance", "", mermaid(stages), "",
+         "## Script to task", "", "| Task | Scripts |", "|---|---|"]
+    for i, t, steps in sections:
+        o.append(f"| [{t}](#{re.sub(r'[^a-z0-9 -]', '', t.lower()).replace(' ', '-')}) | " + ", ".join(f"`{_md(s[0])}`" for s in steps) + " |")
+    for i, t, steps in sections:
+        o += ["", f"## {t}"]
+        for path, when, io, cmd, gloss in steps:
+            name = os.path.basename(path.split()[0]); n = nver(name) if "." in name and not path.startswith("templates") else 0
+            ver = f"canonical = newest copy; {n} older distinct version(s) in `archive/{name.rsplit('.',1)[0]}/`" if n else "single version"
+            o += ["", f"### `{_md(path)}`", "", f"- **When:** {_md(when)}"]
+            if gloss: o.append(f"- **Gloss:** {_md(gloss)}")
+            o.append(f"- **In / out:** {_md(io)}")
+            o.append(f"- **Version:** {ver}.")
+            if cmd: o += ["", "```bash", cmd, "```"]
+    o += ["", "## Unclear / caveats", ""] + [f"- {_md(n)}" for n in notes]
+    return "\n".join(o) + "\n"
+
+RNA_INTRO = '<p>oxRNA simulations of kissing-loop designs 2H, K1, T3, IVT (monomer and 8mer). Follow sections top to bottom.</p>'
+DNA_INTRO = '<p>oxDNA simulations of nanotweezers (nanotw, T3IVT) with umbrella sampling.</p>'
+
 def main():
     d = os.path.join(ROOT, "docs"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "RNA.html"), "w").write(page("RNA kissing-loop simulations: scripts by workflow", "rna", "<p>oxRNA simulations of kissing-loop designs 2H, K1, T3, IVT (monomer and 8mer). Follow sections top to bottom.</p>", RNA_STAGES, RNA_SECTIONS, RNA_NOTES))
+    open(os.path.join(d, 'RNA.md'), 'w').write(page_md('RNA kissing-loop simulations: scripts by workflow', RNA_INTRO, RNA_STAGES, RNA_SECTIONS, RNA_NOTES))
+    open(os.path.join(d, 'DNA.md'), 'w').write(page_md('DNA nanotweezer simulations: scripts by workflow', DNA_INTRO, DNA_STAGES, DNA_SECTIONS, DNA_NOTES))
     open(os.path.join(d, "DNA.html"), "w").write(page("DNA nanotweezer simulations: scripts by workflow", "dna", "<p>oxDNA simulations of nanotweezers (nanotw, T3IVT) with umbrella sampling.</p>", DNA_STAGES, DNA_SECTIONS, DNA_NOTES))
 main()

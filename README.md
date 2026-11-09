@@ -12,13 +12,14 @@ bash setup.sh        # conda/mamba env if available, else .venv + pip; runs a sm
 
 `setup.sh` installs numpy, scipy, pandas, matplotlib, seaborn, jupyter and `oxDNA_analysis_tools` (oat), then imports them and byte-compiles every script. It warns (not fails) if `oxpy` is missing.
 
-## Guides (open in a browser)
+## Guides
 
-- [docs/RNA.html](docs/RNA.html): RNA workflow, script by script (when to use, in/out, example command, versions).
-- [docs/DNA.html](docs/DNA.html): same for DNA.
-- [docs/SCRIPTS.md](docs/SCRIPTS.md) short index, [docs/VERSIONS.md](docs/VERSIONS.md) canonical vs archived versions, [docs/PORTABILITY.md](docs/PORTABILITY.md) hard-coded paths and Slurm settings.
+- [docs/RNA.md](docs/RNA.md): RNA workflow, script by script (when to use, in/out, example command, versions).
+- [docs/DNA.md](docs/DNA.md): same for DNA.
+- [docs/SCRIPTS.md](docs/SCRIPTS.md): short index of scripts by stage.
+- [docs/VERSIONS.md](docs/VERSIONS.md): canonical vs archived versions of each script.
 
-On GitHub the HTML files show as source; download them (or clone) and open locally, they are self-contained.
+Also: [docs/PORTABILITY.md](docs/PORTABILITY.md) (hard-coded paths, Slurm settings). Self-contained HTML twins `docs/RNA.html` and `docs/DNA.html` exist for local browsing (GitHub shows them as source).
 
 ## Repo map
 
@@ -39,7 +40,7 @@ On GitHub the HTML files show as source; download them (or clone) and open local
 
 ## Data location
 
-Not in git. Data live on the USB drive in `Yunshi_data/` (`RNA/`, `DNA/`, `WetLab/`); see `FILES.html` there for the inventory.
+Not in git. Data live on the USB drive in `Yunshi_data/` (`RNA/`, `DNA/`, `WetLab/`); see `FILES.md` there for the inventory.
 
 ## Versions policy
 
