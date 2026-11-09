@@ -1,0 +1,10 @@
+# Python >= 3.9. Derived from imports in rna/ dna/ notebooks/ (see docs/PORTABILITY.md).
+numpy>=1.23
+scipy>=1.9
+pandas>=1.5
+matplotlib>=3.6
+seaborn>=0.12
+jupyter>=1.0
+# oxDNA analysis tools (provides oxDNA_analysis_tools.*; hb_cal, helix_bt, multimer_tb, ffs_* import it
+# and the `oxpy` Python bindings of oxDNA). Installed by setup.sh with a fallback, see README.
+oxDNA-analysis-tools>=2.0
